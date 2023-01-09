@@ -46,9 +46,14 @@ class Casino(private val inputView: InputView, private val resultView: ResultVie
         var index = 0
         do {
             val gamer = gamers[index]
-            val next = ask(gamer)
-            if (gamer.canDraw().not()) break
-            if (next) index++
+            val moveNext = ask(gamer)
+            if (moveNext.not()) {
+                game.draw(gamer)
+                resultView.showPlayer(gamer)
+                if (gamer.canDraw().not()) break
+                continue
+            }
+            if (moveNext) index++
         } while (index < gamers.size)
 
         if (dealer.canDraw()) {
@@ -58,23 +63,9 @@ class Casino(private val inputView: InputView, private val resultView: ResultVie
     }
 
     private fun ask(player: Player): Boolean {
-        val skip = question(player)
-        if (skip) return true
-
-        game.draw(player)
-
-        if (player.canDraw().not()) return true
-
-        resultView.showPlayer(player)
-
-        return ask(player)
-    }
-
-    private fun question(player: Player): Boolean {
         val answer = inputView.ask(player)
-        if (answer.isBlank()) return true
+        if (answer.isBlank()) return ask(player)
         if (answer == No) return true
-
         return false
     }
 
