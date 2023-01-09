@@ -1,5 +1,7 @@
 package blackjack.controller
 
+import blackjack.controller.DrawAction.Draw
+import blackjack.controller.DrawAction.NoDraw
 import blackjack.domain.Dealer
 import blackjack.domain.Game
 import blackjack.domain.Gamer
@@ -46,14 +48,14 @@ class Casino(private val inputView: InputView, private val resultView: ResultVie
         var index = 0
         do {
             val gamer = gamers[index]
-            val moveNext = ask(gamer)
-            if (moveNext.not()) {
+            val action = ask(gamer)
+            if (action == Draw) {
                 game.draw(gamer)
                 resultView.showPlayer(gamer)
                 if (gamer.canDraw().not()) break
                 continue
             }
-            if (moveNext) index++
+            if (action == NoDraw) index++
         } while (index < gamers.size)
 
         if (dealer.canDraw()) {
@@ -62,14 +64,9 @@ class Casino(private val inputView: InputView, private val resultView: ResultVie
         }
     }
 
-    private fun ask(player: Player): Boolean {
-        val answer = inputView.ask(player)
-        if (answer.isBlank()) return ask(player)
-        if (answer == No) return true
-        return false
-    }
+    private fun ask(player: Player): DrawAction = inputView.ask(player)
+}
 
-    companion object {
-        private const val No = "n"
-    }
+enum class DrawAction {
+    Draw, NoDraw
 }

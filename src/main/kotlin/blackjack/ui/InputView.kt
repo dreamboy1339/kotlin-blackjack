@@ -1,6 +1,9 @@
 package blackjack.ui
 
 import blackjack.Tokenizer
+import blackjack.controller.DrawAction
+import blackjack.controller.DrawAction.Draw
+import blackjack.controller.DrawAction.NoDraw
 import blackjack.domain.Gamer
 import blackjack.domain.Player
 
@@ -17,9 +20,13 @@ class InputView {
             }
     }
 
-    fun ask(player: Player): String {
+    fun ask(player: Player): DrawAction {
         println()
         println("${player.name}는 한장의 카드를 더 받겠습니까?(예는 y, 아니오는 n)")
-        return readlnOrNull() ?: ""
+        return when (readlnOrNull()) {
+            "n" -> NoDraw
+            "y" -> Draw
+            else -> ask(player)
+        }
     }
 }
